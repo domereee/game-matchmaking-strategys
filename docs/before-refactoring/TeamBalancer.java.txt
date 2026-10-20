@@ -1,0 +1,113 @@
+package kz.tuleubayev.matchmaking.balancing;
+
+import kz.tuleubayev.matchmaking.model.LobbyRules;
+import kz.tuleubayev.matchmaking.model.Player;
+import kz.tuleubayev.matchmaking.model.Teams;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+/**
+ * Splits a lobby into two teams.
+ * <p>
+ * BEFORE REFACTORING: every algorithm lives in this one class behind a switch. Adding a new
+ * way of balancing means editing this class again (violates Open/Closed), and the class has
+ * four reasons to change (violates Single Responsibility).
+ */
+public class TeamBalancer {
+
+    public static final long RANDOM_SEED = 42L;
+
+    private BalancingMethod method;
+
+    public TeamBalancer(BalancingMethod method) {
+        this.method = method;
+    }
+
+    public void setMethod(BalancingMethod method) {
+        this.method = method;
+    }
+
+    public String strategyName() {
+        return method.name();
+    }
+
+    public Teams balance(List<Player> lobby) {
+        LobbyRules.requireValid(lobby);
+        int cap = lobby.size() / 2;
+        List<Player> blue = new ArrayList<>();
+        List<Player> red = new ArrayList<>();
+        switch (method) {
+            case SNAKE_DRAFT -> {
+                List<Player> sorted = byRatingDesc(lobby);
+                for (int i = 0; i < sorted.size(); i++) {
+                    int pos = i % 4;
+                    if (pos == 0 || pos == 3) {
+                        blue.add(sorted.get(i));
+                    } else {
+                        red.add(sorted.get(i));
+                    }
+                }
+            }
+            case GREEDY -> {
+                for (Player p : byRatingDesc(lobby)) {
+                    if (blue.size() == cap) {
+                        red.add(p);
+                    } else if (red.size() == cap) {
+                        blue.add(p);
+                    } else if (sum(blue) <= sum(red)) {
+                        blue.add(p);
+                    } else {
+                        red.add(p);
+                    }
+                }
+            }
+            case PARTY_PRESERVING -> {
+                Map<String, List<Player>> groups = new LinkedHashMap<>();
+                for (Player p : lobby) {
+                    String key = p.isSolo() ? "solo:" + p.nickname() : "party:" + p.partyId();
+                    groups.computeIfAbsent(key, k -> new ArrayList<>()).add(p);
+                }
+                List<List<Player>> ordered = new ArrayList<>(groups.values());
+                ordered.sort(Comparator.<List<Player>>comparingInt(List::size).reversed()
+                        .thenComparing(Comparator.<List<Player>>comparingInt(TeamBalancer::sum).reversed()));
+                for (List<Player> group : ordered) {
+                    boolean blueFits = blue.size() + group.size() <= cap;
+                    boolean redFits = red.size() + group.size() <= cap;
+                    if (!blueFits && !redFits) {
+                        throw new IllegalArgumentException("Cannot keep party of " + group.size()
+                                + " together in teams of " + cap);
+                    }
+                    if (blueFits && (!redFits || sum(blue) <= sum(red))) {
+                        blue.addAll(group);
+                    } else {
+                        red.addAll(group);
+                    }
+                }
+            }
+            case RANDOM -> {
+                List<Player> shuffled = new ArrayList<>(lobby);
+                Collections.shuffle(shuffled, new Random(RANDOM_SEED));
+                blue.addAll(shuffled.subList(0, cap));
+                red.addAll(shuffled.subList(cap, shuffled.size()));
+            }
+            default -> throw new IllegalStateException("Unknown method " + method);
+        }
+        return new Teams(blue, red);
+    }
+
+    private static List<Player> byRatingDesc(List<Player> lobby) {
+        List<Player> sorted = new ArrayList<>(lobby);
+        sorted.sort(Comparator.comparingInt(Player::rating).reversed().thenComparing(Player::nickname));
+        return sorted;
+    }
+
+    private static int sum(List<Player> team) {
+        return team.stream().mapToInt(Player::rating).sum();
+    }
+}

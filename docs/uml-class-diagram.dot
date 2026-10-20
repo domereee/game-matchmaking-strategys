@@ -1,0 +1,51 @@
+digraph UML {
+graph [rankdir=TB, fontname="Helvetica", nodesep=0.3, ranksep=0.65, label="Video Game Matchmaking - Strategy pattern (Damir Tuleubayev)", labelloc=t, fontsize=18];
+node [shape=plaintext, fontname="Helvetica", fontsize=10];
+edge [fontname="Helvetica", fontsize=9];
+"StrategyDemo" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#fde2e2'><FONT POINT-SIZE='9'>&laquo;client&raquo;</FONT><BR/><B>StrategyDemo</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+main(args)</TD></TR></TABLE>>];
+subgraph cluster_a { label="Family 1 - team balancing (package balancing)"; style=filled; fillcolor="#f0f7ff"; color="#3b82f6";
+"TeamBalancer" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#dbeafe'><FONT POINT-SIZE='9'>&laquo;context&raquo;</FONT><BR/><B>TeamBalancer</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>-strategy: TeamBalancingStrategy</TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+TeamBalancer(strategy)<BR/>+setStrategy(strategy)<BR/>+balance(lobby): Teams</TD></TR></TABLE>>];
+"TeamBalancingStrategy" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#dbeafe'><FONT POINT-SIZE='9'>&laquo;interface&raquo;</FONT><BR/><B>TeamBalancingStrategy</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+split(lobby): Teams<BR/>+name(): String</TD></TR></TABLE>>];
+"SnakeDraftBalancing" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#dbeafe'><B>SnakeDraftBalancing</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+split(lobby)</TD></TR></TABLE>>];
+"GreedyBalancing" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#dbeafe'><B>GreedyBalancing</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+split(lobby)</TD></TR></TABLE>>];
+"PartyPreservingBalancing" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#dbeafe'><B>PartyPreservingBalancing</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+split(lobby)</TD></TR></TABLE>>];
+"RandomBalancing" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#dbeafe'><B>RandomBalancing</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>-seed: long</TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+split(lobby)</TD></TR></TABLE>>];
+"TeamBalancingSelector" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#fef3c7'><FONT POINT-SIZE='9'>&laquo;selector&raquo;</FONT><BR/><B>TeamBalancingSelector</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+choose(mode, lobby): TeamBalancingStrategy</TD></TR></TABLE>>];
+"BalancingMethod" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#dbeafe'><FONT POINT-SIZE='9'>&laquo;enum (legacy names)&raquo;</FONT><BR/><B>BalancingMethod</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>SNAKE_DRAFT, GREEDY,<BR/>PARTY_PRESERVING, RANDOM</TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+strategy()</TD></TR></TABLE>>];
+}
+subgraph cluster_b { label="Family 2 - server selection (package server)"; style=filled; fillcolor="#f0fdf4"; color="#22c55e";
+"ServerPicker" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#dcfce7'><FONT POINT-SIZE='9'>&laquo;context&raquo;</FONT><BR/><B>ServerPicker</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>-strategy: ServerSelectionStrategy</TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+ServerPicker(strategy)<BR/>+setStrategy(strategy)<BR/>+pick(servers, players): Optional</TD></TR></TABLE>>];
+"ServerSelectionStrategy" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#dcfce7'><FONT POINT-SIZE='9'>&laquo;interface&raquo;</FONT><BR/><B>ServerSelectionStrategy</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+choose(servers, players): Optional<BR/>+name(): String</TD></TR></TABLE>>];
+"LowestPingSelection" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#dcfce7'><B>LowestPingSelection</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>-latency: LatencyProvider</TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+choose(...)</TD></TR></TABLE>>];
+"LeastLoadedSelection" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#dcfce7'><B>LeastLoadedSelection</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+choose(...)</TD></TR></TABLE>>];
+"FillFirstSelection" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#dcfce7'><B>FillFirstSelection</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+choose(...)</TD></TR></TABLE>>];
+"ServerSelectionSelector" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#fef3c7'><FONT POINT-SIZE='9'>&laquo;selector&raquo;</FONT><BR/><B>ServerSelectionSelector</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>-clock: Clock</TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+choose(mode): ServerSelectionStrategy</TD></TR></TABLE>>];
+"LatencyProvider" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#fef3c7'><FONT POINT-SIZE='9'>&laquo;interface - isolation boundary&raquo;</FONT><BR/><B>LatencyProvider</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+pingMs(nickname, serverId): int</TD></TR></TABLE>>];
+"SimulatedNetworkProbe" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#fef3c7'><FONT POINT-SIZE='9'>&laquo;simulated external source&raquo;</FONT><BR/><B>SimulatedNetworkProbe</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+pingMs(...)</TD></TR></TABLE>>];
+"FixedLatency (test)" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#f3f4f6'><FONT POINT-SIZE='9'>&laquo;fake in tests&raquo;</FONT><BR/><B>FixedLatency (test)</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+pingMs(...)  // fixed values</TD></TR></TABLE>>];
+}
+subgraph cluster_m { label="model"; style=dashed; "Player" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#f3f4f6'><FONT POINT-SIZE='9'>&laquo;record&raquo;</FONT><BR/><B>Player</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>nickname, rating, partyId</TD></TR></TABLE>>];"Teams" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#f3f4f6'><FONT POINT-SIZE='9'>&laquo;record&raquo;</FONT><BR/><B>Teams</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>blue, red</TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+ratingGap()</TD></TR></TABLE>>];"GameServer" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#f3f4f6'><FONT POINT-SIZE='9'>&laquo;record&raquo;</FONT><BR/><B>GameServer</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>id, region, capacity, freeSlots</TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+fits(n) / load()</TD></TR></TABLE>>];"LobbyRules" [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"><TR><TD BGCOLOR='#f3f4f6'><B>LobbyRules</B></TD></TR><TR><TD ALIGN='LEFT' BALIGN='LEFT'>+requireValid(lobby)</TD></TR></TABLE>>];}
+"StrategyDemo" -> "TeamBalancer" [arrowhead=vee];
+"StrategyDemo" -> "ServerPicker" [arrowhead=vee];
+"StrategyDemo" -> "TeamBalancingSelector" [arrowhead=vee];
+"StrategyDemo" -> "ServerSelectionSelector" [arrowhead=vee];
+"TeamBalancer" -> "TeamBalancingStrategy" [arrowtail=odiamond, dir=back, arrowhead=none];
+"TeamBalancer" -> "LobbyRules" [arrowhead=vee, style=dashed];
+"BalancingMethod" -> "TeamBalancingStrategy" [arrowhead=vee, style=dashed, label="creates"];
+"SnakeDraftBalancing" -> "TeamBalancingStrategy" [arrowhead=empty, style=dashed];
+"GreedyBalancing" -> "TeamBalancingStrategy" [arrowhead=empty, style=dashed];
+"PartyPreservingBalancing" -> "TeamBalancingStrategy" [arrowhead=empty, style=dashed];
+"RandomBalancing" -> "TeamBalancingStrategy" [arrowhead=empty, style=dashed];
+"TeamBalancingSelector" -> "TeamBalancingStrategy" [arrowhead=vee, style=dashed, label="returns"];
+"ServerPicker" -> "ServerSelectionStrategy" [arrowtail=odiamond, dir=back, arrowhead=none];
+"LowestPingSelection" -> "ServerSelectionStrategy" [arrowhead=empty, style=dashed];
+"LeastLoadedSelection" -> "ServerSelectionStrategy" [arrowhead=empty, style=dashed];
+"FillFirstSelection" -> "ServerSelectionStrategy" [arrowhead=empty, style=dashed];
+"ServerSelectionSelector" -> "ServerSelectionStrategy" [arrowhead=vee, style=dashed, label="returns"];
+"LowestPingSelection" -> "LatencyProvider" [arrowhead=vee];
+"SimulatedNetworkProbe" -> "LatencyProvider" [arrowhead=empty, style=dashed];
+"FixedLatency (test)" -> "LatencyProvider" [arrowhead=empty, style=dashed];
+"TeamBalancingStrategy" -> "Teams" [arrowhead=vee, style=dashed];
+"Teams" -> "Player" [arrowhead=vee, style=dashed];
+"ServerSelectionStrategy" -> "GameServer" [arrowhead=vee, style=dashed];
+}

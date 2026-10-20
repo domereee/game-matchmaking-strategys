@@ -1,0 +1,6 @@
+package kz.tuleubayev.matchmaking.balancing;
+
+/** The ways a lobby can be split into two teams. */
+public enum BalancingMethod {
+    SNAKE_DRAFT, GREEDY, PARTY_PRESERVING, RANDOM
+}
